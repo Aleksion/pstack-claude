@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.9.91 - Calibrate comparison tools
+
+Build the Lever requires known-bad controls for each comparison output and refuses a match when required input is missing.
+
 ## 0.9.90 - Pi shows what a running agent is doing
 
 On Pi, a running agent's `list_agents` entry gains an `activity` field: its current tool call, or the last one once it ended, as the tool name and a one-line summary of its arguments, and the first line of its latest message. A footer line, `pstack: 2 running · a1b2c3d4 bash: ls -la`, names the count and the most recently active agent while any runs, including one `send_message` resumes after a reload, and clears when none does. The new `/pstack-agents` command shows each agent's status, activity, transcript path, and the command to read it: `tail -f` while it runs, `pi --export` once it ended. Activity is read from the child's RPC stream and held in memory. The extension never appends it to the session or sends it as a message, so the model sees it only in a `list_agents` result, and the child's session has no second writer. Only the top-level session sets the footer. @Nickonomic asked for a way to see a background agent's work while it runs (#279); this completes the live view that 0.9.89's transcript path began.
