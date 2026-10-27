@@ -27,7 +27,16 @@ dir=$(node <plugin>/skills/reflect/scripts/claude-project-dir.mjs) && node <plug
 
 It covers the three layouts (flat `<id>.jsonl`, nested `<id>/<id>.jsonl`, subagent `<parent>/subagents/<child>.jsonl`), newest first, and prints the first path whose opening typed prompt carries the fragment. Do not reimplement the scan by hand: the first line of a transcript is session metadata, not a message, a session that starts with `/clear` or a `!` shell command records that command's wrapper and output as `user` records before the prompt, and files run to several megabytes, so the finder streams each candidate and stops at its first typed `user` record. If the line exits 1, write a tight digest of the session and pass that instead. It lists, one line each in turn order, the user's prompts and corrections, the tool calls and their results, and the files touched. It states no diagnosis, verdict, or cause. The reviewers judge the session, not your conclusions about it.
 
-## 2. Spawn three reviewers in parallel
+## 2. Find earlier reflects on the same symptom
+
+A fix that passed its own test can still fail in use: its precondition may fail silently, or the edit may never land. Before fanning out, look for earlier reflects on the symptom this session is about. Two sources:
+
+- Prior synthesis files, if the project keeps them, whose Accepted rows name the same skill, tool, or failure.
+- Skill edits the transcript references: a skill the parent followed that an earlier reflect changed, or a fix the user says was already made.
+
+Read each match's Accepted rows. Pass the rows to the synthesizer in step 4. If nothing matches, say so in one line and pass "none".
+
+## 3. Spawn three reviewers in parallel
 
 One message, three `Agent` calls, `subagent_type: "general-purpose"`. Reviewers need MCP access to look up the tickets, chat threads, and observability traces the transcript references, so pick a subagent_type that retains MCP access. The prompt forbids file writes. The parent applies edits.
 
@@ -41,17 +50,17 @@ Each reviewer and the synthesizer name a role line in `pstack-models.md` and a d
 
 Pass each template verbatim, substituting the transcript path or digest where marked. Add nothing beside a transcript path, not even a focus note for a long transcript. Reviewers return findings in the `Agent` response body.
 
-## 3. Synthesize
+## 4. Synthesize
 
-One `Agent` call, `subagent_type: "general-purpose"`, `model` from the `reflect judgment, divergent, synthesizer` line (default in [Models](#models)). It spot-verifies citations through MCP, so pick a subagent_type that retains MCP access. Pass `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. It returns an Accepted / Rejected / Backlog list.
+One `Agent` call, `subagent_type: "general-purpose"`, `model` from the `reflect judgment, divergent, synthesizer` line (default in [Models](#models)). It spot-verifies citations through MCP, so pick a subagent_type that retains MCP access. Pass `references/synthesizer.md` verbatim, with each reviewer's full output and the prior Accepted rows from step 2 inlined where marked. It returns a Prior rows / Accepted / Rejected / Backlog list.
 
-## 4. Structural enforcement check
+## 5. Structural enforcement check
 
 Move any Accepted item that a lint rule, script, metadata flag, or runtime check would enforce more reliably to Backlog. See the **encode-lessons-in-structure** principle skill.
 
-## 5. Apply
+## 6. Apply
 
-Present the synthesizer's full Accepted / Rejected / Backlog output and wait for explicit approval before applying any Accepted edit. The user picks the subset and may redirect routings. Skill changes affect every future agent in the org. Do not auto-apply.
+Present the synthesizer's full Prior rows / Accepted / Rejected / Backlog output and wait for explicit approval before applying any Accepted edit. The user picks the subset and may redirect routings. Skill changes affect every future agent in the org. Do not auto-apply.
 
 File each Backlog item to your team's devex or backlog tracker without waiting. Only the Accepted list waits for approval.
 
@@ -66,7 +75,7 @@ Follow each approved row's Routing exactly:
 
 If your environment ships a SKILL.md validator, run it on every touched skill before declaring done.
 
-## 6. Summarize for the user
+## 7. Summarize for the user
 
 Short list, no preamble:
 

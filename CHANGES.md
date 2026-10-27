@@ -2,6 +2,10 @@
 
 This file is the release changelog, with one `## <version> - <title>` entry per release, newest first. The Cursor-to-Claude rewrite rules live in [`tools/substitutions.json`](tools/substitutions.json), and the [sync boundary](CONTRIBUTING.md#the-sync-boundary) in `CONTRIBUTING.md` defines how a change to upstream's skill content is declared.
 
+## 0.9.104 - reflect checks earlier reflects and asks for proof each fix is live
+
+`reflect` now looks for earlier reflects on the same symptom, in prior synthesis files and in skill edits the transcript references, and passes their Accepted rows to the synthesizer. The synthesizer marks each one holding, decayed, or misframed, with evidence, in a new Prior rows table. Every Accepted row also states an outcome measure, a re-check date, and live proof: a merged PR, a scheduled job that has run, or a message seen to arrive through the real path. A passing test of the mechanism is not live proof, and a row without live proof goes to Backlog. A fix can pass its own test and still stop working when its precondition fails silently, or never land, and the next reflect had no step that would notice.
+
 ## 0.9.103 - sync to upstream e73df47 (v0.15.32): adds /statechart and /ketchup-video
 
 The upstream pin moves from `7b353f7` to `e73df47`, upstream v0.15.32, 18 pstack commits. `/statechart` draws how a system moves between states as a Mermaid statechart generated from a TLA+ model, with each bug TLC finds as a numbered path, and also turns an agreed chart into a TLA+ skeleton. Its first run installs TLC and Java with mise, about 305 MB. `/ketchup-video` gives the `/ketchup` catch-up as a short silent video of slides, with the waiting calls as text under it. `/create-formal-verification-skill` now tells the skill it generates to read each TLA+ result with `/statechart`, and `/poteto-help` routes to both new skills. The package now carries 43 public skills and 24 principles.

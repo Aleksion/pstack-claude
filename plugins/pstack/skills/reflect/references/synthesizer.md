@@ -10,6 +10,12 @@ Reviewer outputs:
 
 <DIVERGENT_OUTPUT>
 
+Prior Accepted rows from earlier reflects on the same symptom (may be "none"):
+
+<PRIOR_ROWS>
+
+For each prior row, decide from evidence in the transcript or through MCP whether the fix is holding, decayed, or misframed, and record it under Prior rows. Treat a recurrence of the same failure as evidence against the prior row, not as a new, unrelated finding.
+
 Apply each criterion to every finding:
 
 - Durability: still true in 6 months once paths, SHAs, tool versions, and code shapes have changed.
@@ -33,15 +39,29 @@ Keep (durable patterns):
 - "skill-bundled scripts run under bun with own lockfile, not pnpm workspace"
 - "path-shaped triggers belong in `paths:`, not description prose"
 
+Every Accepted row also states:
+
+- Outcome measure: what is observed when the fix works, such as a message arriving or a failure no longer recurring.
+- Re-check date: when the next reflect, or the user, should look again.
+- Live proof: the artifact that shows the fix is in effect, such as a merged PR, a scheduled job that has run, or a message seen to arrive through the real path. A passing test of the mechanism alone is not live proof. Without a live-proof artifact, route the row to Backlog.
+
 Output exactly the format below. No preamble, no narration. One sentence per cell. A reviewer should read each Problem/Proposal pair in 5 seconds.
+
+## Prior rows
+
+| Prior row | Verdict | Evidence |
+|---|---|---|
+| <earlier Accepted row> | <holding / decayed / misframed> | <what was observed, with the transcript line or lookup> |
+
+Holding: the fix is live and the failure did not recur. Decayed: the fix worked or was meant to, and has stopped, or never landed. Misframed: the fix is live but the failure persists, so the diagnosis was wrong. Write "None" when no prior rows were passed. Each decayed or misframed row also appears in Accepted as a revised row, or in Backlog.
 
 ## Accepted
 
-| Problem | Proposal | Routing |
-|---|---|---|
-| <failure mode in a skill the parent used> | <change to that skill's body> | <skill path + section> |
-| <skill existed but didn't trigger> | <tune the skill's description so it fires next time> | <tune description: <skill path>> |
-| <new pattern, no existing skill is a real home> | <draft a new skill via plugin-dev:skill-development> | <new skill via plugin-dev:skill-development: <kebab-name>> |
+| Problem | Proposal | Routing | Outcome measure | Re-check date | Live proof |
+|---|---|---|---|---|---|
+| <failure mode in a skill the parent used> | <change to that skill's body> | <skill path + section> | <what is observed when it works> | <date> | <merged PR, scheduled job, or message seen to arrive> |
+| <skill existed but didn't trigger> | <tune the skill's description so it fires next time> | <tune description: <skill path>> | <...> | <date> | <...> |
+| <new pattern, no existing skill is a real home> | <draft a new skill via plugin-dev:skill-development> | <new skill via plugin-dev:skill-development: <kebab-name>> | <...> | <date> | <...> |
 
 One row per finding. The user approves row by row.
 
